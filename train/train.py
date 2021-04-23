@@ -30,7 +30,7 @@ parse.add_argument("--tenantid")
 parse.add_argument("--acclientid")
 parse.add_argument("--accsecret")
     
-args = parser.parse_args()
+args = parse.parse_args()
 
 
 sp = ServicePrincipalAuthentication(tenant_id=args.tenantid, # tenantID
