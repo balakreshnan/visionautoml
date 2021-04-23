@@ -23,7 +23,25 @@ from zipfile import ZipFile
 
 print("SDK version:", azureml.core.VERSION)
 
-ws = Workspace.from_config()
+import argparse 
+
+parse = argparse.ArgumentParser()
+parse.add_argument("--tenantid")
+parse.add_argument("--acclientid")
+parse.add_argument("--accsecret")
+    
+args = parser.parse_args()
+
+
+sp = ServicePrincipalAuthentication(tenant_id=args.tenantid, # tenantID
+                                    service_principal_id=args.acclientid, # clientId
+                                    service_principal_password=args.accsecret) # clientSecret
+
+ws = Workspace.get(name="gputraining",
+                   auth=sp,
+                   subscription_id="c46a9435-c957-4e6c-a0f4-b9a597984773", resource_group="mlops")
+
+#ws = Workspace.from_config()
 keyvault = ws.get_default_keyvault()
 tenantid = keyvault.get_secret(name="tenantid")
 acclientid = keyvault.get_secret(name="acclientid")
