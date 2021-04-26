@@ -215,6 +215,38 @@ automl_image_run = experiment.submit(image_config_yolov5)
 
 automl_image_run.wait_for_completion(wait_post_processing=True)
 
+from azureml.train.automl import AutoMLImageConfig
+from azureml.train.hyperdrive import GridParameterSampling, RandomParameterSampling, BayesianParameterSampling
+from azureml.train.hyperdrive import BanditPolicy, HyperDriveConfig, PrimaryMetricGoal
+from azureml.train.hyperdrive import choice, uniform
+
+parameter_space = {
+    'model_name': choice('maskrcnn_resnet50_fpn'),
+    'learning_rate': uniform(0.0001, 0.001),
+    #'warmup_cosine_lr_warmup_epochs': choice(0, 3),
+    'optimizer': choice('sgd', 'adam', 'adamw'),
+    'min_size': choice(600, 800)
+}
+
+tuning_settings = {
+    'iterations': 20, 
+    'max_concurrent_iterations': 4, 
+    'hyperparameter_sampling': RandomParameterSampling(parameter_space),  
+    'policy': BanditPolicy(evaluation_interval=2, slack_factor=0.2, delay_evaluation=6)
+}
+
+
+automl_image_config = AutoMLImageConfig(task='image-instance-segmentation',
+                                        compute_target=compute_target,
+                                        training_data=training_dataset,
+                                        validation_data=validation_dataset,
+                                        primary_metric='mean_average_precision',
+                                        **tuning_settings)
+
+automl_image_run = experiment.submit(automl_image_config)
+
+automl_image_run.wait_for_completion(wait_post_processing=True)
+
 # Register the model from the best run
 
 best_child_run = automl_image_run.get_best_child()
