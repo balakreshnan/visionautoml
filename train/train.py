@@ -214,3 +214,9 @@ image_config_yolov5 = AutoMLImageConfig(task='image-object-detection',
 automl_image_run = experiment.submit(image_config_yolov5)
 
 automl_image_run.wait_for_completion(wait_post_processing=True)
+
+# Register the model from the best run
+
+best_child_run = automl_image_run.get_best_child()
+model_name = best_child_run.properties['model_name']
+model = best_child_run.register_model(model_name = model_name, model_path='outputs/model.pt')
