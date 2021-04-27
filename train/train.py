@@ -221,11 +221,42 @@ from azureml.train.hyperdrive import BanditPolicy, HyperDriveConfig, PrimaryMetr
 from azureml.train.hyperdrive import choice, uniform
 
 parameter_space = {
-    'model_name': choice('maskrcnn_resnet50_fpn'),
-    'learning_rate': uniform(0.0001, 0.001),
-    #'warmup_cosine_lr_warmup_epochs': choice(0, 3),
-    'optimizer': choice('sgd', 'adam', 'adamw'),
-    'min_size': choice(600, 800)
+    'model': choice(
+        {
+            'model_name': choice('yolov5'),
+            'learning_rate': uniform(0.0001, 0.01),
+            #'model_size': choice('small', 'medium'), # model-specific
+            'img_size': choice(640, 704, 768), # model-specific
+        },
+        {
+            'model_name': choice('fasterrcnn_resnet50_fpn'),
+            'learning_rate': uniform(0.0001, 0.001),
+            #'warmup_cosine_lr_warmup_epochs': choice(0, 3),
+            'optimizer': choice('sgd', 'adam', 'adamw'),
+            'min_size': choice(600, 800), # model-specific
+        },
+        {
+            'model_name': choice('fasterrcnn_resnet34_fpn'),
+            'learning_rate': uniform(0.0001, 0.001),
+            #'warmup_cosine_lr_warmup_epochs': choice(0, 3),
+            'optimizer': choice('sgd', 'adam', 'adamw'),
+            'min_size': choice(600, 800), # model-specific
+        },
+        {
+            'model_name': choice('fasterrcnn_resnet18_fpn'),
+            'learning_rate': uniform(0.0001, 0.001),
+            #'warmup_cosine_lr_warmup_epochs': choice(0, 3),
+            'optimizer': choice('sgd', 'adam', 'adamw'),
+            'min_size': choice(600, 800), # model-specific
+        },
+        {
+            'model_name': choice('retinanet_resnet50_fpn'),
+            'learning_rate': uniform(0.0001, 0.001),
+            #'warmup_cosine_lr_warmup_epochs': choice(0, 3),
+            'optimizer': choice('sgd', 'adam', 'adamw'),
+            'min_size': choice(600, 800), # model-specific
+        }
+    )
 }
 
 tuning_settings = {
@@ -236,7 +267,7 @@ tuning_settings = {
 }
 
 
-automl_image_config = AutoMLImageConfig(task='image-instance-segmentation',
+automl_image_config = AutoMLImageConfig(task='image-object-detection',
                                         compute_target=compute_target,
                                         training_data=training_dataset,
                                         validation_data=validation_dataset,
@@ -246,6 +277,10 @@ automl_image_config = AutoMLImageConfig(task='image-instance-segmentation',
 automl_image_run = experiment.submit(automl_image_config)
 
 automl_image_run.wait_for_completion(wait_post_processing=True)
+
+from azureml.core import Run
+hyperdrive_run = Run(experiment=experiment, run_id=automl_image_run.id + '_HD')
+hyperdrive_run
 
 # Register the model from the best run
 
