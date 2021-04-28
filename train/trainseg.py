@@ -119,6 +119,15 @@ os.remove(data_file)
 from IPython.display import Image
 Image(filename='./odFridgeObjectsMask/images/31.jpg')
 
+import argparse
+import os
+import json
+import numpy as np
+import PIL.Image as Image
+import xml.etree.ElementTree as ET
+
+from simplification.cutil import simplify_coords
+from skimage import measure
 
 def convert_mask_to_polygon(mask, max_polygon_points=100, score_threshold=0.5, max_refinement_iterations=25,
                             edge_safety_padding=1):
