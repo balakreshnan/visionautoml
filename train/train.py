@@ -16,14 +16,22 @@ from azureml.core.compute import AmlCompute, ComputeTarget
 from azureml.core import Experiment
 
 from azureml.core import Workspace
-import os
 import urllib
 from zipfile import ZipFile
+
+from azureml.train.automl import AutoMLImageConfig
+from azureml.train.hyperdrive import GridParameterSampling, RandomParameterSampling, BayesianParameterSampling
+from azureml.train.hyperdrive import BanditPolicy, HyperDriveConfig, PrimaryMetricGoal
+from azureml.train.hyperdrive import choice, uniform
+from IPython.display import Image
 
 
 print("SDK version:", azureml.core.VERSION)
 
 import argparse 
+import json
+import os
+import xml.etree.ElementTree as ET
 
 parse = argparse.ArgumentParser()
 parse.add_argument("--tenantid")
@@ -101,12 +109,7 @@ with ZipFile(data_file, 'r') as zip:
 # delete zip file
 os.remove(data_file)
 
-from IPython.display import Image
 Image(filename='./odFridgeObjects/images/31.jpg')
-
-import json
-import os
-import xml.etree.ElementTree as ET
 
 src = "./odFridgeObjects/"
 train_validation_ratio = 5
@@ -214,11 +217,6 @@ image_config_yolov5 = AutoMLImageConfig(task='image-object-detection',
 automl_image_run = experiment.submit(image_config_yolov5)
 
 automl_image_run.wait_for_completion(wait_post_processing=True)
-
-from azureml.train.automl import AutoMLImageConfig
-from azureml.train.hyperdrive import GridParameterSampling, RandomParameterSampling, BayesianParameterSampling
-from azureml.train.hyperdrive import BanditPolicy, HyperDriveConfig, PrimaryMetricGoal
-from azureml.train.hyperdrive import choice, uniform
 
 parameter_space = {
     'model': choice(
