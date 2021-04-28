@@ -284,7 +284,7 @@ def convert_mask_in_VOC_to_jsonl(base_dir, workspace):
                 else:
                     print("Skipping unknown file: {}".format(filename))
 
-from jsonl_converter import convert_mask_in_VOC_to_jsonl
+# from jsonl_converter import convert_mask_in_VOC_to_jsonl
 
 data_path = "./odFridgeObjectsMask/"
 convert_mask_in_VOC_to_jsonl(data_path, ws)
