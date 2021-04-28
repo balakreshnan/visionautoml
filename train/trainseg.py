@@ -116,6 +116,7 @@ with ZipFile(data_file, 'r') as zip:
 # delete zip file
 os.remove(data_file)
 
+from IPython.display import Image
 Image(filename='./odFridgeObjectsMask/images/31.jpg')
 
 
